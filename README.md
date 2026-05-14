@@ -5,9 +5,9 @@
 ## Структура
 
 - `src/hw4_mlops.py` - единый CLI для обучения, оценки, загрузки/скачивания модели из S3 и сравнения версий
-- `params.yaml` - параметры данных, обучения, дообучения и S3
-- `dvc.yaml` - DVC pipeline: базовое обучение, скачивание модели из S3, дообучение, сравнение
-- `docker-compose.yml` - локальный MinIO
+- `mlops_pipeline/params.yaml` - параметры данных, обучения, дообучения и S3
+- `mlops_pipeline/dvc.yaml` - DVC pipeline: базовое обучение, скачивание модели из S3, дообучение, сравнение
+- `mlops_pipeline/docker-compose.yml` - локальный MinIO
 - `HW4_MLOps_Sergeeva.ipynb` - ноутбук с итоговыми метриками.
 
 ## DVC pipeline
