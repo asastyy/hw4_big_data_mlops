@@ -1,0 +1,13 @@
+torch
+torchvision
+pandas
+numpy
+scikit-learn
+pillow
+tqdm
+matplotlib
+tensorboard
+boto3
+dvc[s3]
+PyYAML
+tabulate

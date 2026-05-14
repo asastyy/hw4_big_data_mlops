@@ -1,0 +1,192 @@
+schema: '2.0'
+stages:
+  train_base_and_upload:
+    cmd: "python src/hw4_mlops.py train --experiment-name base_train1 --train-csv
+      ai-vs-human-generated-dataset-hw/Train_1/train.csv --train-root ai-vs-human-generated-dataset-hw/Train_1
+      --test-csv ai-vs-human-generated-dataset-hw/Test_1/test.csv --test-root ai-vs-human-generated-dataset-hw/Test_1
+      --output-dir artifacts/base --epochs 5 --batch-size 32 --lr 0.001 --weight-decay
+      0.0001 --image-size 224 --num-workers 4 --seed 42 --step-size 3 --gamma 0.1
+      --tb-logdir tb_logs --s3-upload-key models/resnet18_base_train1.pt --s3-bucket
+      hw4-models --s3-endpoint-url http://localhost:9000\n"
+    deps:
+    - path: ai-vs-human-generated-dataset-hw/Test_1/test.csv
+      hash: md5
+      md5: df35590d6c17e7a7daf7b1791c9a1fda
+      size: 263907
+    - path: ai-vs-human-generated-dataset-hw/Test_1/test_data
+      hash: md5
+      md5: 7180034643f3ba6cbf4b107b0c6462b9.dir
+      size: 229687400
+      nfiles: 3997
+    - path: ai-vs-human-generated-dataset-hw/Train_1/train.csv
+      hash: md5
+      md5: 9c9092344c19efa222161bd32f319fd0
+      size: 661510
+    - path: ai-vs-human-generated-dataset-hw/Train_1/train_data
+      hash: md5
+      md5: 784e9c5553b1be916aacc76e45fecc8f.dir
+      size: 576524940
+      nfiles: 9993
+    - path: src/hw4_mlops.py
+      hash: md5
+      md5: 708a2354cd446fa8891238bf52857268
+      size: 16518
+    params:
+      params.yaml:
+        data:
+          root: ai-vs-human-generated-dataset-hw
+          train1_csv: Train_1/train.csv
+          train1_root: Train_1
+          test1_csv: Test_1/test.csv
+          test1_root: Test_1
+          train2_csv: Train_2/train.csv
+          train2_root: Train_2
+          test2_csv: Test_2/test.csv
+          test2_root: Test_2
+        s3:
+          endpoint_url: http://localhost:9000
+          bucket: hw4-models
+          base_key: models/resnet18_base_train1.pt
+          finetuned_key: models/resnet18_finetuned_train2.pt
+        train:
+          epochs: 5
+          batch_size: 32
+          lr: 0.001
+          weight_decay: 0.0001
+          image_size: 224
+          num_workers: 4
+          seed: 42
+          step_size: 3
+          gamma: 0.1
+    outs:
+    - path: artifacts/base/metrics.json
+      hash: md5
+      md5: abf307960400ccce47604b69e052b2f1
+      size: 1567
+    - path: artifacts/base/model.pt
+      hash: md5
+      md5: c356a54c78b49bf23db5a2f5845979b8
+      size: 44784459
+  download_base_from_s3:
+    cmd: "python src/hw4_mlops.py download --s3-key models/resnet18_base_train1.pt
+      --output artifacts/base_from_s3.pt --s3-bucket hw4-models --s3-endpoint-url
+      http://localhost:9000\n"
+    deps:
+    - path: artifacts/base/model.pt
+      hash: md5
+      md5: c356a54c78b49bf23db5a2f5845979b8
+      size: 44784459
+    - path: src/hw4_mlops.py
+      hash: md5
+      md5: 708a2354cd446fa8891238bf52857268
+      size: 16518
+    params:
+      params.yaml:
+        s3:
+          endpoint_url: http://localhost:9000
+          bucket: hw4-models
+          base_key: models/resnet18_base_train1.pt
+          finetuned_key: models/resnet18_finetuned_train2.pt
+    outs:
+    - path: artifacts/base_from_s3.pt
+      hash: md5
+      md5: c356a54c78b49bf23db5a2f5845979b8
+      size: 44784459
+  finetune_and_upload:
+    cmd: "python src/hw4_mlops.py train --experiment-name finetuned_train2 --base-checkpoint
+      artifacts/base_from_s3.pt --train-csv ai-vs-human-generated-dataset-hw/Train_2/train.csv
+      --train-root ai-vs-human-generated-dataset-hw/Train_2 --test-csv ai-vs-human-generated-dataset-hw/Test_2/test.csv
+      --test-root ai-vs-human-generated-dataset-hw/Test_2 --output-dir artifacts/finetuned
+      --epochs 3 --batch-size 32 --lr 0.0001 --weight-decay 0.0001 --image-size 224
+      --num-workers 4 --seed 42 --step-size 2 --gamma 0.1 --tb-logdir tb_logs --s3-upload-key
+      models/resnet18_finetuned_train2.pt --s3-bucket hw4-models --s3-endpoint-url
+      http://localhost:9000\n"
+    deps:
+    - path: ai-vs-human-generated-dataset-hw/Test_2/test.csv
+      hash: md5
+      md5: ec5a8a6020375f7f9b7b40fa925147e0
+      size: 131541
+    - path: ai-vs-human-generated-dataset-hw/Test_2/test_data
+      hash: md5
+      md5: 3fdd80f7ccb7170c29fe26d3b29db296.dir
+      size: 114259501
+      nfiles: 2000
+    - path: ai-vs-human-generated-dataset-hw/Train_2/train.csv
+      hash: md5
+      md5: 0f7ec0c515fce25ac6149d3400150851
+      size: 264024
+    - path: ai-vs-human-generated-dataset-hw/Train_2/train_data
+      hash: md5
+      md5: 75785993ea237855df0872313f006fea.dir
+      size: 229080094
+      nfiles: 3997
+    - path: artifacts/base_from_s3.pt
+      hash: md5
+      md5: c356a54c78b49bf23db5a2f5845979b8
+      size: 44784459
+    - path: src/hw4_mlops.py
+      hash: md5
+      md5: 708a2354cd446fa8891238bf52857268
+      size: 16518
+    params:
+      params.yaml:
+        data:
+          root: ai-vs-human-generated-dataset-hw
+          train1_csv: Train_1/train.csv
+          train1_root: Train_1
+          test1_csv: Test_1/test.csv
+          test1_root: Test_1
+          train2_csv: Train_2/train.csv
+          train2_root: Train_2
+          test2_csv: Test_2/test.csv
+          test2_root: Test_2
+        finetune:
+          epochs: 3
+          batch_size: 32
+          lr: 0.0001
+          weight_decay: 0.0001
+          image_size: 224
+          num_workers: 4
+          seed: 42
+          step_size: 2
+          gamma: 0.1
+        s3:
+          endpoint_url: http://localhost:9000
+          bucket: hw4-models
+          base_key: models/resnet18_base_train1.pt
+          finetuned_key: models/resnet18_finetuned_train2.pt
+    outs:
+    - path: artifacts/finetuned/metrics.json
+      hash: md5
+      md5: 7b988cac383b17e4f501568d830cbfd4
+      size: 1107
+    - path: artifacts/finetuned/model.pt
+      hash: md5
+      md5: a9ea8bf732b11d70c7de9ef268942888
+      size: 44784267
+  compare_models:
+    cmd: "python src/hw4_mlops.py compare --base-metrics artifacts/base/metrics.json
+      --finetuned-metrics artifacts/finetuned/metrics.json --output reports/comparison.md
+      --csv-output reports/comparison.csv\n"
+    deps:
+    - path: artifacts/base/metrics.json
+      hash: md5
+      md5: abf307960400ccce47604b69e052b2f1
+      size: 1567
+    - path: artifacts/finetuned/metrics.json
+      hash: md5
+      md5: 7b988cac383b17e4f501568d830cbfd4
+      size: 1107
+    - path: src/hw4_mlops.py
+      hash: md5
+      md5: 708a2354cd446fa8891238bf52857268
+      size: 16518
+    outs:
+    - path: reports/comparison.csv
+      hash: md5
+      md5: ad5999e903bae7b31723ce6ee9e72f74
+      size: 426
+    - path: reports/comparison.md
+      hash: md5
+      md5: ec0a13ed73611bf5104f6ac989513abd
+      size: 966

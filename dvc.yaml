@@ -1,0 +1,110 @@
+stages:
+  train_base_and_upload:
+    cmd: >
+      python src/hw4_mlops.py train
+      --experiment-name base_train1
+      --train-csv ${data.root}/${data.train1_csv}
+      --train-root ${data.root}/${data.train1_root}
+      --test-csv ${data.root}/${data.test1_csv}
+      --test-root ${data.root}/${data.test1_root}
+      --output-dir artifacts/base
+      --epochs ${train.epochs}
+      --batch-size ${train.batch_size}
+      --lr ${train.lr}
+      --weight-decay ${train.weight_decay}
+      --image-size ${train.image_size}
+      --num-workers ${train.num_workers}
+      --seed ${train.seed}
+      --step-size ${train.step_size}
+      --gamma ${train.gamma}
+      --tb-logdir tb_logs
+      --s3-upload-key ${s3.base_key}
+      --s3-bucket ${s3.bucket}
+      --s3-endpoint-url ${s3.endpoint_url}
+    deps:
+      - src/hw4_mlops.py
+      - ${data.root}/${data.train1_csv}
+      - ${data.root}/${data.train1_root}/train_data
+      - ${data.root}/${data.test1_csv}
+      - ${data.root}/${data.test1_root}/test_data
+    params:
+      - data
+      - train
+      - s3
+    outs:
+      - artifacts/base/model.pt
+    metrics:
+      - artifacts/base/metrics.json:
+          cache: false
+
+  download_base_from_s3:
+    cmd: >
+      python src/hw4_mlops.py download
+      --s3-key ${s3.base_key}
+      --output artifacts/base_from_s3.pt
+      --s3-bucket ${s3.bucket}
+      --s3-endpoint-url ${s3.endpoint_url}
+    deps:
+      - src/hw4_mlops.py
+      - artifacts/base/model.pt
+    params:
+      - s3
+    outs:
+      - artifacts/base_from_s3.pt
+
+  finetune_and_upload:
+    cmd: >
+      python src/hw4_mlops.py train
+      --experiment-name finetuned_train2
+      --base-checkpoint artifacts/base_from_s3.pt
+      --train-csv ${data.root}/${data.train2_csv}
+      --train-root ${data.root}/${data.train2_root}
+      --test-csv ${data.root}/${data.test2_csv}
+      --test-root ${data.root}/${data.test2_root}
+      --output-dir artifacts/finetuned
+      --epochs ${finetune.epochs}
+      --batch-size ${finetune.batch_size}
+      --lr ${finetune.lr}
+      --weight-decay ${finetune.weight_decay}
+      --image-size ${finetune.image_size}
+      --num-workers ${finetune.num_workers}
+      --seed ${finetune.seed}
+      --step-size ${finetune.step_size}
+      --gamma ${finetune.gamma}
+      --tb-logdir tb_logs
+      --s3-upload-key ${s3.finetuned_key}
+      --s3-bucket ${s3.bucket}
+      --s3-endpoint-url ${s3.endpoint_url}
+    deps:
+      - src/hw4_mlops.py
+      - artifacts/base_from_s3.pt
+      - ${data.root}/${data.train2_csv}
+      - ${data.root}/${data.train2_root}/train_data
+      - ${data.root}/${data.test2_csv}
+      - ${data.root}/${data.test2_root}/test_data
+    params:
+      - data
+      - finetune
+      - s3
+    outs:
+      - artifacts/finetuned/model.pt
+    metrics:
+      - artifacts/finetuned/metrics.json:
+          cache: false
+
+  compare_models:
+    cmd: >
+      python src/hw4_mlops.py compare
+      --base-metrics artifacts/base/metrics.json
+      --finetuned-metrics artifacts/finetuned/metrics.json
+      --output reports/comparison.md
+      --csv-output reports/comparison.csv
+    deps:
+      - src/hw4_mlops.py
+      - artifacts/base/metrics.json
+      - artifacts/finetuned/metrics.json
+    outs:
+      - reports/comparison.md:
+          cache: false
+      - reports/comparison.csv:
+          cache: false

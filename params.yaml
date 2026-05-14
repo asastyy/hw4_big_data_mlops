@@ -1,0 +1,38 @@
+data:
+  root: ai-vs-human-generated-dataset-hw
+  train1_csv: Train_1/train.csv
+  train1_root: Train_1
+  test1_csv: Test_1/test.csv
+  test1_root: Test_1
+  train2_csv: Train_2/train.csv
+  train2_root: Train_2
+  test2_csv: Test_2/test.csv
+  test2_root: Test_2
+
+train:
+  epochs: 5
+  batch_size: 32
+  lr: 0.001
+  weight_decay: 0.0001
+  image_size: 224
+  num_workers: 4
+  seed: 42
+  step_size: 3
+  gamma: 0.1
+
+finetune:
+  epochs: 3
+  batch_size: 32
+  lr: 0.0001
+  weight_decay: 0.0001
+  image_size: 224
+  num_workers: 4
+  seed: 42
+  step_size: 2
+  gamma: 0.1
+
+s3:
+  endpoint_url: http://localhost:9000
+  bucket: hw4-models
+  base_key: models/resnet18_base_train1.pt
+  finetuned_key: models/resnet18_finetuned_train2.pt

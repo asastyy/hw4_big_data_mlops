@@ -1,0 +1,43 @@
+{
+  "experiment_name": "finetuned_train2",
+  "device": "cuda",
+  "model_path": "artifacts/finetuned/model.pt",
+  "s3_uri": "s3://hw4-models/models/resnet18_finetuned_train2.pt",
+  "elapsed_sec": 66.38298654556274,
+  "train_history": [
+    {
+      "epoch": 1,
+      "accuracy": 0.9337002752064048,
+      "f1": 0.9349054286416114,
+      "precision": 0.9355948869223205,
+      "recall": 0.9342169857633775,
+      "loss": 0.16219362047260213,
+      "lr": 0.0001
+    },
+    {
+      "epoch": 2,
+      "accuracy": 0.9412059044283212,
+      "f1": 0.94221785099582,
+      "precision": 0.9438423645320198,
+      "recall": 0.9405989199803633,
+      "loss": 0.1462197761059046,
+      "lr": 1e-05
+    },
+    {
+      "epoch": 3,
+      "accuracy": 0.9577182887165374,
+      "f1": 0.9587099926704129,
+      "precision": 0.9542801556420234,
+      "recall": 0.9631811487481591,
+      "loss": 0.12030760262768239,
+      "lr": 1e-05
+    }
+  ],
+  "test_metrics": {
+    "accuracy": 0.9595,
+    "f1": 0.9591939546599496,
+    "precision": 0.9616161616161616,
+    "recall": 0.9567839195979899,
+    "loss": 0.11851048466563224
+  }
+}
